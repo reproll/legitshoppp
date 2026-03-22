@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LegitShop Mini App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg-dark: #120a1f; 
+            --card-bg: #1e1332; 
+            --accent-green: #39ff14; 
+            --text-main: #ffffff; 
+            --text-muted: #9b8fb3; 
+            --border-color: rgba(255, 255, 255, 0.1); 
+            --btn-bg: #2a1b42;
+        }
+        * { box-sizing: border-box; }
+        body {
+            background-color: var(--bg-dark); color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0; padding: 0; padding-bottom: 100px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* UI Elemek */
+        .top-bar { background-color: var(--bg-dark); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 5000; }
+        .top-balance .value { font-size: 18px; font-weight: bold; color: var(--accent-green); }
+        .app-title { font-weight: bold; font-size: 16px; color: var(--accent-green); text-align: center; }
+        
+        .card { background-color: var(--card-bg); margin: 12px; border-radius: 12px; padding: 15px; border: 1px solid var(--border-color); overflow: hidden; }
+        .section-title { font-size: 14px; margin: 15px 12px 5px 12px; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
+
+        .btn-primary { background-color: var(--accent-green); color: #000; border: none; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: bold; width: 100%; cursor: pointer; }
+        .btn-menu { background-color: var(--btn-bg); color: var(--text-main); border: none; padding: 15px; border-radius: 8px; width: 100%; margin-bottom: 12px; font-weight: bold; cursor: pointer; }
+
+        /* Város választó Flexbox-al (Középre igazítás) */
+        .grid-container { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 10px; 
+            margin: 0 12px 20px 12px; 
+            justify-content: center; 
+        }
+        .grid-btn { 
+            background-color: var(--btn-bg); 
+            border: 1px solid var(--border-color); 
+            padding: 15px; 
+            border-radius: 8px; 
+            text-align: center; 
+            cursor: pointer; 
+            font-size: 13px;
+            flex: 1 1 calc(50% - 10px); 
+            min-width: 140px;
+            max-width: calc(50% - 5px);
+        }
+        .grid-btn:active { background-color: var(--accent-green); color: #000; }
+
+        /* Termék Grid */
+        .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 12px; }
+        .product-card { background-color: var(--card-bg); border-radius: 10px; border: 1px solid var(--border-color); overflow: hidden; display: flex; flex-direction: column; }
+        .product-img img { width: 100%; height: 110px; object-fit: cover; }
+        .product-info { padding: 8px; flex-grow: 1; display: flex; flex-direction: column; }
+        .product-title { font-size: 13px; font-weight: bold; margin-bottom: 4px; }
+        .product-price { color: var(--accent-green); font-weight: bold; margin-bottom: 8px; }
+
+        .qty-controls { display: flex; align-items: center; justify-content: space-between; background: var(--bg-dark); border-radius: 6px; margin-bottom: 8px; padding: 2px; }
+        .qty-btn { background: none; border: none; color: var(--accent-green); font-size: 18px; padding: 5px 12px; cursor: pointer; }
+
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-color); }
+        .cart-total { margin-top: 15px; font-size: 18px; font-weight: bold; text-align: right; color: var(--accent-green); }
+
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background-color: var(--bg-dark); display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid var(--border-color); z-index: 6000; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); font-size: 10px; cursor: pointer; flex: 1; }
+        .nav-item.active { color: var(--accent-green); }
+        .nav-icon { font-size: 20px; }
+
+        .view-content { display: none; }
+        .view-content.active { display: block; }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <div class="top-balance">
+            <div style="font-size: 10px; color: var(--text-muted);">Balance</div>
+            <div class="value" id="top-balance-display">0 HUF</div>
+        </div>
+        <div class="app-title">LEGITSHOP</div>
+        <button id="btn-lang" style="background:none; border:1px solid var(--accent-green); color:white; border-radius:5px; padding:2px 8px;">HU</button>
+    </div>
+
+    <div id="view-home" class="view-content active">
+        <div class="card" style="padding: 0; position: relative; border: 1px solid var(--accent-green);">
+            <img src="https://i.postimg.cc/Qxf1xRS4/Gemini-Generated-Image-2fkmz42fkmz42fkm.png" alt="Welcome" style="width: 100%; display: block;">
+            <div style="padding: 15px; text-align: center; background: rgba(30, 19, 50, 0.9);">
+                <h3 style="margin: 0; color: var(--accent-green); letter-spacing: 2px;">ÜDVÖZLÜNK!</h3>
+                <p style="margin: 5px 0 0 0; font-size: 12px; color: var(--text-muted);">A legjobb minőség, a leggyorsabb kiszolgálás.</p>
+            </div>
+        </div>
+        <div style="padding: 0 12px;">
+            <button class="btn-menu" onclick="showView('view-menu')">📋 RÉGIÓ VÁLASZTÁSA</button>
+        </div>
+    </div>
+
+    <div id="view-menu" class="view-content">
+        <div class="section-title">Budapest & Környéke</div>
+        <div class="grid-container">
+            <div class="grid-btn city-btn">Corvin</div>
+            <div class="grid-btn city-btn">Nyugati</div>
+            <div class="grid-btn city-btn">Soroksári</div>
+            <div class="grid-btn city-btn">Duna Plaza</div>
+            <div class="grid-btn city-btn">Kelenföld</div>
+            <div class="grid-btn city-btn">Óbuda</div>
+            <div class="grid-btn city-btn">Dunakeszi</div>
+        </div>
+
+        <div class="section-title">Vidéki Városok</div>
+        <div class="grid-container">
+            <div class="grid-btn city-btn">Győr</div>
+            <div class="grid-btn city-btn">Érd</div>
+            <div class="grid-btn city-btn">Budaörs</div>
+            <div class="grid-btn city-btn">Debrecen</div>
+            <div class="grid-btn city-btn">Székesfehérvár</div>
+            <div class="grid-btn city-btn">Szeged</div>
+            <div class="grid-btn city-btn">Tatabánya</div>
+            <div class="grid-btn city-btn">Kecskemét</div>
+            <div class="grid-btn city-btn">Nyíregyháza</div>
+            <div class="grid-btn city-btn">Miskolc</div>
+            <div class="grid-btn city-btn">Dunaújváros</div>
+            <div class="grid-btn city-btn">Szombathely</div>
+            <div class="grid-btn city-btn">Szolnok</div>
+        </div>
+    </div>
+
+    <div id="view-products" class="view-content">
+        <div style="padding: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <div onclick="showView('view-menu')" style="color: var(--accent-green); font-weight: bold; cursor: pointer;">← Vissza</div>
+            <div id="current-city-label" style="font-size: 14px; font-weight: bold; color: var(--text-muted);">Város</div>
+        </div>
+        <div class="product-grid" id="product-list-container"></div>
+    </div>
+
+    <div id="view-cart" class="view-content">
+        <div class="card">
+            <h3 style="text-align: center; margin-top:0;">Kosár</h3>
+            <div id="cart-items-container">
+                <p style="text-align: center; color: var(--text-muted); padding: 20px;">A kosár jelenleg üres.</p>
+            </div>
+            <div id="cart-footer" style="display: none;">
+                <div class="cart-total" id="cart-total-price">Total: 0 HUF</div>
+                <button class="btn-primary" style="margin-top: 15px;" onclick="checkout()">RENDELÉS LEADÁSA</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-balance" class="view-content">
+        <div class="card">
+            <p>Fizetési cím (SOL):</p>
+            <div style="background: #000; padding: 15px; border-radius: 8px; font-size: 10px; word-break: break-all; border: 1px solid var(--border-color);" id="wallet-addr">HSCKinrA7mZiU5ZpnqxXK5Y7HasmFuDYNQ2WsfjD2udx</div>
+            <button class="btn-primary" style="margin-top: 15px;" onclick="copyWallet()">CÍM MÁSOLÁSA</button>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item active" data-target="view-home"><span class="nav-icon">🏠</span><span>Home</span></div>
+        <div class="nav-item" data-target="view-menu"><span class="nav-icon">📋</span><span>Menu</span></div>
+        <div class="nav-item" data-target="view-balance"><span class="nav-icon">👛</span><span>Wallet</span></div>
+        <div class="nav-item" data-target="view-cart"><span class="nav-icon">🛒</span><span id="cart-count-badge">Cart</span></div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        // 1. EGYENLEG BEÁLLÍTÁSA (Átírhatod teszteléshez)
+        let userBalance = 0; 
+        document.getElementById('top-balance-display').innerText = userBalance + " HUF";
+
+        const allCities = ["Corvin", "Nyugati", "Soroksári", "Duna Plaza", "Kelenföld", "Óbuda", "Dunakeszi", "Győr", "Érd", "Budaörs", "Debrecen", "Székesfehérvár", "Szeged", "Tatabánya", "Kecskemét", "Nyíregyháza", "Miskolc", "Dunaújváros", "Szombathely", "Szolnok"];
+
+        const products = [
+            { id: 1, name: "Cocain-1g", price: 40000, img: "https://i.postimg.cc/xNCC2tp6/Coke.png", cities: allCities },
+            { id: 2, name: "Cocain-0.5g", price: 20000, img: "https://i.postimg.cc/xNCC2tp6/Coke.png", cities: allCities },
+            { id: 3, name: "AMF-2g", price: 25000, img: "https://i.postimg.cc/V0668DZG/Amf.png", cities: allCities },
+            { id: 4, name: "Meph-2g", price: 26500, img: "https://i.postimg.cc/RJFFBXpT/Meph.jpg", cities: allCities },
+            { id: 5, name: "Meph-3g", price: 41000, img: "https://i.postimg.cc/RJFFBXpT/Meph.jpg", cities: allCities },
+            { id: 6, name: "MDMA-2g", price: 28000, img: "https://i.postimg.cc/9Qs88R3h/MDMA-crystals.jpg", cities: allCities },
+            { id: 7, name: "XTC-5Pcs", price: 25000, img: "https://i.postimg.cc/QKtt30Yb/Kek-puni.jpg", cities: allCities },
+            { id: 8, name: "Meth-2g", price: 60000, img: "https://i.postimg.cc/2L66D29h/metecske.jpg", cities: allCities },
+            { id: 9, name: "Meth-3g", price: 90000, img: "https://i.postimg.cc/2L66D29h/metecske.jpg", cities: allCities },
+            { id: 10, name: "L. Cherry Gelato-3g", price: 28000, img: "https://i.postimg.cc/sGXXrwHK/W1-kep.png", cities: allCities },
+            { id: 11, name: "L. Cherry Gelato-5g", price: 40000, img: "https://i.postimg.cc/sGXXrwHK/W1-kep.png", cities: allCities },
+            { id: 12, name: "Pink Lemonade-3g", price: 24500, img: "https://i.postimg.cc/2L66D292/w2.png", cities: allCities },
+            { id: 13, name: "Pink Lemonade-5g", price: 40000, img: "https://i.postimg.cc/2L66D292/w2.png", cities: allCities },
+            { id: 14, name: "Pink Lemonade-8g", price: 60000, img: "https://i.postimg.cc/2L66D292/w2.png", cities: allCities }
+        ];
+
+        let cart = [];
+
+        // NAVIGÁCIÓ
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                showView(item.getAttribute('data-target'));
+            });
+        });
+
+        function showView(viewId) {
+            document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            if(viewId === 'view-cart') renderCart();
+        }
+
+        // VÁROS KIVÁLASZTÁS
+        document.querySelectorAll('.city-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const cityName = this.innerText;
+                document.getElementById('current-city-label').innerText = cityName;
+                renderProducts(cityName);
+                showView('view-products');
+            });
+        });
+
+        function renderProducts(cityName) {
+            const container = document.getElementById('product-list-container');
+            container.innerHTML = '';
+            const filtered = products.filter(p => p.cities.includes(cityName));
+            
+            filtered.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    <div class="product-img"><img src="${p.img}"></div>
+                    <div class="product-info">
+                        <div class="product-title">${p.name}</div>
+                        <div class="product-price">${p.price} HUF</div>
+                        <div class="qty-controls">
+                            <button class="qty-btn" onclick="updateQtyBtn(this, -1)">-</button>
+                            <span class="p-qty">1</span>
+                            <button class="qty-btn" onclick="updateQtyBtn(this, 1)">+</button>
+                        </div>
+                        <button class="btn-primary" style="padding: 8px; font-size:12px;" onclick="addToCart(${p.id}, this)">Hozzáad</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function updateQtyBtn(btn, change) {
+            const span = btn.parentElement.querySelector('.p-qty');
+            let val = parseInt(span.innerText) + change;
+            if(val < 1) val = 1;
+            span.innerText = val;
+        }
+
+        function addToCart(productId, btn) {
+            const qty = parseInt(btn.parentElement.querySelector('.p-qty').innerText);
+            const product = products.find(p => p.id === productId);
+            const existing = cart.find(item => item.id === productId);
+            if(existing) { existing.qty += qty; } else { cart.push({ ...product, qty: qty }); }
+            updateCartBadge();
+            tg.HapticFeedback.impactOccurred('medium');
+            alert("Added to cart!");
+        }
+
+        function updateCartBadge() {
+            const count = cart.reduce((sum, item) => sum + item.qty, 0);
+            document.getElementById('cart-count-badge').innerText = count > 0 ? `Cart (${count})` : "Cart";
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cart-items-container');
+            const footer = document.getElementById('cart-footer');
+            if(cart.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 20px;">Your cart is empty.</p>';
+                footer.style.display = 'none';
+                return;
+            }
+            footer.style.display = 'block';
+            container.innerHTML = '';
+            let total = 0;
+            cart.forEach((item, index) => {
+                const subtotal = item.price * item.qty;
+                total += subtotal;
+                const div = document.createElement('div');
+                div.className = 'cart-item';
+                div.innerHTML = `
+                    <div><div style="font-weight:bold;">${item.name}</div><div style="font-size:11px;">${item.qty}x ${item.price} HUF</div></div>
+                    <div style="text-align:right;"><div style="color:var(--accent-green);">${subtotal} HUF</div><button onclick="removeFromCart(${index})" style="background:none; border:none; color:red; font-size:10px;">Delete</button></div>
+                `;
+                container.appendChild(div);
+            });
+            document.getElementById('cart-total-price').innerText = `Total: ${total} HUF`;
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            renderCart();
+            updateCartBadge();
+        }
+
+        function copyWallet() {
+            const addr = document.getElementById('wallet-addr').innerText;
+            navigator.clipboard.writeText(addr);
+            tg.showAlert("Address copied!");
+        }
+
+        // --- CHECKOUT ELLENŐRZÉSSEL ---
+        function checkout() {
+            let total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+            if (userBalance < total) {
+                if (tg && tg.showAlert) {
+                    tg.HapticFeedback.notificationOccurred('error');
+                    tg.showAlert("Insufficient balance! Please top up your account to complete the purchase.");
+                } else {
+                    alert("Insufficient balance! Please top up your account.");
+                }
+                return;
+            }
+
+            tg.showConfirm("Are you sure you want to place this order?", (ok) => {
+                if(ok) {
+                    const selectedCity = document.getElementById('current-city-label').innerText;
+                    tg.sendData(JSON.stringify({order: cart, city: selectedCity, total: total}));
+                    tg.close();
+                }
+            });
+        }
+    </script>
+</body>
+</html>
