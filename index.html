@@ -7,165 +7,272 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --bg-dark: #120a1f; 
-            --card-bg: #1e1332; 
-            --accent-green: #39ff14; 
+            /* CYBERPUNK / NEON SZÍNEK */
+            --bg-dark: #0a0510; 
+            --card-bg: rgba(15, 10, 25, 0.6); 
+            --accent-cyan: #00ffff; 
+            --accent-pink: #ff00ff;
+            --accent-gold: #ffd700;
             --text-main: #ffffff; 
-            --text-muted: #9b8fb3; 
-            --border-color: rgba(255, 255, 255, 0.1); 
-            --btn-bg: #2a1b42;
+            --text-muted: #a09eb0; 
+            --border-color: rgba(0, 255, 255, 0.3); 
+            --btn-bg: rgba(20, 10, 35, 0.7);
+            
+            /* NEON RAGYOGÁS */
+            --glow-pink: 0 0 10px rgba(255, 0, 255, 0.5);
+            --glow-cyan: 0 0 10px rgba(0, 255, 255, 0.5);
+            --glow-gold: 0 0 10px rgba(255, 215, 0, 0.5);
         }
         * { box-sizing: border-box; }
+        
         body {
-            background-color: var(--bg-dark); color: var(--text-main);
+            /* TÉGLAFALAS HÁTTÉRKÉP LINKJE */
+            background-image: url('https://i.postimg.cc/bw2d9Fcm/3f732b59-0559-42b6-a475-7b2f8355a333.jpg'); 
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             margin: 0; padding: 0; padding-bottom: 100px;
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* UI Elemek */
-        .top-bar { background-color: var(--bg-dark); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 5000; }
-        .top-balance .value { font-size: 18px; font-weight: bold; color: var(--accent-green); }
-        .app-title { font-weight: bold; font-size: 16px; color: var(--accent-green); text-align: center; }
+        /* UI Elemek - ÜVEGHATÁS (Glassmorphism) */
+        .top-bar { 
+            background: rgba(10, 5, 15, 0.8); backdrop-filter: blur(10px);
+            padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; 
+            border-bottom: 1px solid rgba(255,0,255,0.3); position: sticky; top: 0; z-index: 5000; 
+            box-shadow: var(--glow-pink);
+        }
+        .top-balance .value { font-size: 18px; font-weight: bold; color: var(--accent-cyan); text-shadow: var(--glow-cyan); transition: 0.3s; }
+        .app-title { font-weight: bold; font-size: 16px; color: var(--text-main); text-align: center; text-shadow: 0 0 8px var(--accent-pink); letter-spacing: 2px; }
         
-        .card { background-color: var(--card-bg); margin: 12px; border-radius: 12px; padding: 15px; border: 1px solid var(--border-color); overflow: hidden; }
-        .section-title { font-size: 14px; margin: 15px 12px 5px 12px; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
-
-        .btn-primary { background-color: var(--accent-green); color: #000; border: none; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: bold; width: 100%; cursor: pointer; }
-        .btn-menu { background-color: var(--btn-bg); color: var(--text-main); border: none; padding: 15px; border-radius: 8px; width: 100%; margin-bottom: 12px; font-weight: bold; cursor: pointer; }
-
-        /* Város választó Flexbox-al (Középre igazítás) */
-        .grid-container { 
-            display: flex; 
-            flex-wrap: wrap; 
-            gap: 10px; 
-            margin: 0 12px 20px 12px; 
-            justify-content: center; 
+        .card { 
+            background: var(--card-bg); backdrop-filter: blur(8px);
+            margin: 12px; border-radius: 12px; padding: 15px; 
+            border: 1px solid var(--border-color); box-shadow: var(--glow-cyan);
         }
+        .section-title { font-size: 14px; margin: 15px 12px 5px 12px; color: var(--accent-pink); font-weight: bold; text-transform: uppercase; text-shadow: var(--glow-pink); }
+
+        .btn-primary { 
+            background: linear-gradient(90deg, #aa00ff, #00d4ff); color: #fff; border: none; 
+            padding: 12px; border-radius: 8px; font-size: 14px; font-weight: bold; width: 100%; 
+            cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 15px rgba(0, 255, 255, 0.4); transition: 0.2s;
+        }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-primary:disabled { background: #555; box-shadow: none; cursor: not-allowed; opacity: 0.5; }
+        
+        .btn-menu { 
+            background: var(--btn-bg); color: var(--accent-cyan); border: 1px solid var(--accent-cyan); 
+            padding: 15px; border-radius: 8px; width: 100%; margin-bottom: 12px; font-weight: bold; 
+            cursor: pointer; box-shadow: var(--glow-cyan); backdrop-filter: blur(5px); transition: 0.3s;
+        }
+        .btn-menu:active { background: rgba(0,255,255,0.3); }
+
+        /* Napi Slot Machine & LegitCoins */
+        .slot-container { display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; }
+        .slot-box {
+            background: rgba(0, 0, 0, 0.7); border: 2px solid var(--accent-gold); border-radius: 10px;
+            width: 70px; height: 70px; display: flex; align-items: center; justify-content: center;
+            font-size: 35px; box-shadow: inset var(--glow-gold); text-shadow: 0 0 10px #fff;
+        }
+        .coupon-btn {
+            background: rgba(0,0,0,0.5); border: 1px solid var(--accent-gold); color: var(--accent-gold);
+            padding: 10px; border-radius: 8px; font-weight: bold; width: 100%; margin-bottom: 8px;
+            cursor: pointer; text-shadow: var(--glow-gold); box-shadow: inset 0 0 5px rgba(255, 215, 0, 0.2);
+        }
+        .coupon-btn:active { background: var(--accent-gold); color: #000; }
+
+        /* Input mező */
+        input[type="text"] {
+            background: rgba(0,0,0,0.5); border: 1px solid var(--accent-pink); color: white;
+            padding: 12px; border-radius: 8px; font-size: 14px; outline: none; width: 100%;
+            box-shadow: inset var(--glow-pink);
+        }
+
+        /* Város választó Flexbox */
+        .grid-container { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 12px 20px 12px; justify-content: center; }
         .grid-btn { 
-            background-color: var(--btn-bg); 
-            border: 1px solid var(--border-color); 
-            padding: 15px; 
-            border-radius: 8px; 
-            text-align: center; 
-            cursor: pointer; 
-            font-size: 13px;
-            flex: 1 1 calc(50% - 10px); 
-            min-width: 140px;
-            max-width: calc(50% - 5px);
+            background: var(--btn-bg); backdrop-filter: blur(5px); border: 1px solid rgba(255,0,255,0.4); color: #fff;
+            padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; font-size: 13px;
+            flex: 1 1 calc(50% - 10px); min-width: 140px; max-width: calc(50% - 5px); box-shadow: inset 0 0 10px rgba(0,0,0,0.5); transition: 0.3s;
         }
-        .grid-btn:active { background-color: var(--accent-green); color: #000; }
+        .grid-btn:active { background: rgba(255,0,255,0.3); box-shadow: var(--glow-pink); border-color: var(--accent-pink); }
 
         /* Termék Grid */
         .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 12px; }
-        .product-card { background-color: var(--card-bg); border-radius: 10px; border: 1px solid var(--border-color); overflow: hidden; display: flex; flex-direction: column; }
+        .product-card { 
+            background: var(--card-bg); backdrop-filter: blur(8px); border-radius: 10px; border: 1px solid var(--border-color); 
+            overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--glow-cyan);
+        }
         .product-img img { width: 100%; height: 110px; object-fit: cover; }
         .product-info { padding: 8px; flex-grow: 1; display: flex; flex-direction: column; }
-        .product-title { font-size: 13px; font-weight: bold; margin-bottom: 4px; }
-        .product-price { color: var(--accent-green); font-weight: bold; margin-bottom: 8px; }
+        .product-title { font-size: 13px; font-weight: bold; margin-bottom: 4px; color: #fff; text-shadow: 0 0 3px #000; }
+        .product-price { color: var(--accent-cyan); font-weight: bold; margin-bottom: 8px; text-shadow: var(--glow-cyan); }
+        .qty-controls { display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.6); border-radius: 6px; margin-bottom: 8px; padding: 2px; border: 1px solid rgba(255,255,255,0.1); }
+        .qty-btn { background: none; border: none; color: var(--accent-pink); font-size: 18px; padding: 5px 12px; cursor: pointer; text-shadow: var(--glow-pink); }
+        .p-qty { color: #fff; font-weight: bold; }
 
-        .qty-controls { display: flex; align-items: center; justify-content: space-between; background: var(--bg-dark); border-radius: 6px; margin-bottom: 8px; padding: 2px; }
-        .qty-btn { background: none; border: none; color: var(--accent-green); font-size: 18px; padding: 5px 12px; cursor: pointer; }
+        /* Kosár */
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .cart-total { margin-top: 15px; font-size: 18px; font-weight: bold; text-align: right; color: var(--accent-cyan); text-shadow: var(--glow-cyan); }
 
-        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-color); }
-        .cart-total { margin-top: 15px; font-size: 18px; font-weight: bold; text-align: right; color: var(--accent-green); }
-
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background-color: var(--bg-dark); display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid var(--border-color); z-index: 6000; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); font-size: 10px; cursor: pointer; flex: 1; }
-        .nav-item.active { color: var(--accent-green); }
-        .nav-icon { font-size: 20px; }
+        /* Navigáció */
+        .bottom-nav { 
+            position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10, 5, 15, 0.85); backdrop-filter: blur(10px);
+            display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid rgba(0, 255, 255, 0.3); 
+            box-shadow: 0 -2px 15px rgba(0, 255, 255, 0.2); z-index: 6000;
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); font-size: 10px; cursor: pointer; flex: 1; transition: 0.3s; }
+        .nav-item.active { color: var(--accent-cyan); text-shadow: var(--glow-cyan); }
+        .nav-icon { font-size: 20px; margin-bottom: 3px; }
 
         .view-content { display: none; }
-        .view-content.active { display: block; }
+        .view-content.active { display: block; animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .tx-list { list-style: none; padding: 0; margin: 0; font-size: 12px; color: var(--text-muted); }
+        .tx-list li { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
     </style>
 </head>
 <body>
 
     <div class="top-bar">
         <div class="top-balance">
-            <div style="font-size: 10px; color: var(--text-muted);">Balance</div>
+            <div style="font-size: 10px; color: var(--text-muted);" data-i18n="top_balance">Balance</div>
             <div class="value" id="top-balance-display">0 HUF</div>
         </div>
         <div class="app-title">LEGITSHOP</div>
-        <button id="btn-lang" style="background:none; border:1px solid var(--accent-green); color:white; border-radius:5px; padding:2px 8px;">HU</button>
+        <button id="btn-lang" onclick="toggleLanguage()" style="background:none; border:1px solid var(--accent-pink); color:var(--accent-pink); border-radius:5px; padding:4px 10px; font-weight:bold; cursor:pointer; box-shadow: var(--glow-pink);">EN</button>
     </div>
 
     <div id="view-home" class="view-content active">
-        <div class="card" style="padding: 0; position: relative; border: 1px solid var(--accent-green);">
-            <img src="https://i.postimg.cc/Qxf1xRS4/Gemini-Generated-Image-2fkmz42fkmz42fkm.png" alt="Welcome" style="width: 100%; display: block;">
-            <div style="padding: 15px; text-align: center; background: rgba(30, 19, 50, 0.9);">
-                <h3 style="margin: 0; color: var(--accent-green); letter-spacing: 2px;">ÜDVÖZLÜNK!</h3>
-                <p style="margin: 5px 0 0 0; font-size: 12px; color: var(--text-muted);">A legjobb minőség, a leggyorsabb kiszolgálás.</p>
+        <div style="padding: 12px 12px 0 12px;">
+            <button class="btn-menu" onclick="showView('view-slot')" style="border-color: var(--accent-gold); color: var(--accent-gold); box-shadow: var(--glow-gold);" data-i18n="btn_open_slot">🎰 OPEN SLOT</button>
+        </div>
+
+        <div class="card" style="padding: 0; position: relative; border: 1px solid var(--accent-pink); box-shadow: var(--glow-pink);">
+            <img src="https://i.postimg.cc/zGt3CbfV/1.png" alt="Welcome" style="width: 100%; display: block; border-radius: 12px 12px 0 0;">
+            <div style="padding: 15px; text-align: center; background: rgba(10, 5, 15, 0.85); border-radius: 0 0 12px 12px;">
+                <h3 style="margin: 0; color: var(--accent-cyan); letter-spacing: 2px; text-shadow: var(--glow-cyan);" data-i18n="welcome_title">ÜDVÖZLÜNK!</h3>
+                <p style="margin: 5px 0 0 0; font-size: 12px; color: var(--text-muted);" data-i18n="welcome_desc">A legjobb minőség, a leggyorsabb kiszolgálás.</p>
             </div>
         </div>
+        
         <div style="padding: 0 12px;">
-            <button class="btn-menu" onclick="showView('view-menu')">📋 RÉGIÓ VÁLASZTÁSA</button>
+            <button class="btn-menu" onclick="showView('view-menu')" data-i18n="btn_regions">📋 RÉGIÓ VÁLASZTÁSA</button>
+        </div>
+
+        <div style="padding: 0 12px;">
+            <button class="btn-menu" onclick="openSupport()" style="border-color: var(--accent-cyan); color: var(--accent-cyan); box-shadow: var(--glow-cyan);" data-i18n="btn_support">💬 ÜGYFÉLSZOLGÁLAT</button>
+        </div>
+    </div>
+
+    <div id="view-slot" class="view-content">
+        <div style="padding: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <div onclick="showView('view-home')" style="color: var(--accent-pink); font-weight: bold; cursor: pointer; text-shadow: var(--glow-pink);" data-i18n="btn_back">← Vissza</div>
+            <div style="color: var(--accent-gold); font-weight: bold; text-shadow: var(--glow-gold);">🪙 <span id="lc-display">0</span> LC</div>
+        </div>
+
+        <div class="card" style="text-align: center; border-color: var(--accent-gold); box-shadow: var(--glow-gold);">
+            <h4 style="margin: 0 0 15px 0; color: var(--accent-gold); text-shadow: var(--glow-gold); letter-spacing: 1px;" data-i18n="slot_title">NAPI PÖRGETÉS</h4>
+            <div class="slot-container">
+                <div class="slot-box" id="slot1">🍒</div>
+                <div class="slot-box" id="slot2">💎</div>
+                <div class="slot-box" id="slot3">7️⃣</div>
+            </div>
+            <button class="btn-primary" id="btn-spin" onclick="spinSlot()" style="background: linear-gradient(90deg, #b8860b, #ffd700); box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);" data-i18n="btn_spin">🎰 PÖRGETÉS</button>
+            <div id="spin-timer" style="margin-top: 10px; font-size: 12px; color: var(--accent-pink); font-weight: bold; display: none;"><span data-i18n="next_spin">Új pörgetés:</span> <span id="timer-val">--:--:--</span></div>
+            <p style="font-size:11px; color:var(--text-muted); margin-top:10px;" data-i18n="slot_desc">Pörgess minden nap LegitCoinért (LC), és váltsd be kuponokra!</p>
+        </div>
+
+        <div class="card">
+            <h4 style="margin: 0 0 15px 0; color: var(--accent-cyan);" data-i18n="coupon_shop">Kupon Bolt</h4>
+            <button class="coupon-btn" onclick="buyCoupon(0.1, 50)">-10% Kedvezmény (50 LC)</button>
+            <button class="coupon-btn" onclick="buyCoupon(0.25, 150)">-25% Kedvezmény (150 LC)</button>
+            <button class="coupon-btn" onclick="buyCoupon(0.5, 300)">-50% Kedvezmény (300 LC)</button>
+            <p id="active-coupon-display" style="color:var(--accent-pink); font-size:12px; text-align:center; font-weight:bold; display:none;"></p>
         </div>
     </div>
 
     <div id="view-menu" class="view-content">
-        <div class="section-title">Budapest & Környéke</div>
+        <div class="section-title" data-i18n="region_bp">Budapest & Környéke</div>
         <div class="grid-container">
-            <div class="grid-btn city-btn">Corvin</div>
-            <div class="grid-btn city-btn">Nyugati</div>
-            <div class="grid-btn city-btn">Soroksári</div>
-            <div class="grid-btn city-btn">Duna Plaza</div>
-            <div class="grid-btn city-btn">Kelenföld</div>
-            <div class="grid-btn city-btn">Óbuda</div>
+            <div class="grid-btn city-btn">Corvin</div><div class="grid-btn city-btn">Nyugati</div>
+            <div class="grid-btn city-btn">Soroksári</div><div class="grid-btn city-btn">Duna Plaza</div>
+            <div class="grid-btn city-btn">Kelenföld</div><div class="grid-btn city-btn">Óbuda</div>
             <div class="grid-btn city-btn">Dunakeszi</div>
         </div>
 
-        <div class="section-title">Vidéki Városok</div>
+        <div class="section-title" data-i18n="region_vid">Vidéki Városok</div>
         <div class="grid-container">
-            <div class="grid-btn city-btn">Győr</div>
-            <div class="grid-btn city-btn">Érd</div>
-            <div class="grid-btn city-btn">Budaörs</div>
-            <div class="grid-btn city-btn">Debrecen</div>
-            <div class="grid-btn city-btn">Székesfehérvár</div>
-            <div class="grid-btn city-btn">Szeged</div>
-            <div class="grid-btn city-btn">Tatabánya</div>
-            <div class="grid-btn city-btn">Kecskemét</div>
-            <div class="grid-btn city-btn">Nyíregyháza</div>
-            <div class="grid-btn city-btn">Miskolc</div>
-            <div class="grid-btn city-btn">Dunaújváros</div>
-            <div class="grid-btn city-btn">Szombathely</div>
+            <div class="grid-btn city-btn">Győr</div><div class="grid-btn city-btn">Érd</div>
+            <div class="grid-btn city-btn">Budaörs</div><div class="grid-btn city-btn">Debrecen</div>
+            <div class="grid-btn city-btn">Székesfehérvár</div><div class="grid-btn city-btn">Szeged</div>
+            <div class="grid-btn city-btn">Tatabánya</div><div class="grid-btn city-btn">Kecskemét</div>
+            <div class="grid-btn city-btn">Nyíregyháza</div><div class="grid-btn city-btn">Miskolc</div>
+            <div class="grid-btn city-btn">Dunaújváros</div><div class="grid-btn city-btn">Szombathely</div>
             <div class="grid-btn city-btn">Szolnok</div>
         </div>
     </div>
 
     <div id="view-products" class="view-content">
         <div style="padding: 12px; display: flex; justify-content: space-between; align-items: center;">
-            <div onclick="showView('view-menu')" style="color: var(--accent-green); font-weight: bold; cursor: pointer;">← Vissza</div>
-            <div id="current-city-label" style="font-size: 14px; font-weight: bold; color: var(--text-muted);">Város</div>
+            <div onclick="showView('view-menu')" style="color: var(--accent-pink); font-weight: bold; cursor: pointer; text-shadow: var(--glow-pink);" data-i18n="btn_back">← Vissza</div>
+            <div id="current-city-label" style="font-size: 15px; font-weight: bold; color: #fff; text-shadow: 0 0 5px #000;">Város</div>
         </div>
         <div class="product-grid" id="product-list-container"></div>
     </div>
 
     <div id="view-cart" class="view-content">
         <div class="card">
-            <h3 style="text-align: center; margin-top:0;">Kosár</h3>
+            <h3 style="text-align: center; color: var(--accent-cyan); text-shadow: var(--glow-cyan); margin-top:0;" data-i18n="cart_title">Kosár</h3>
             <div id="cart-items-container">
-                <p style="text-align: center; color: var(--text-muted); padding: 20px;">A kosár jelenleg üres.</p>
+                <p style="text-align: center; color: var(--text-muted); padding: 20px;" data-i18n="cart_empty">A kosár jelenleg üres.</p>
             </div>
-            <div id="cart-footer" style="display: none;">
+            <div id="cart-footer" style="display: none; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                <div id="discount-display" style="text-align:right; color:var(--accent-pink); font-size:14px; margin-bottom:5px; display:none;"></div>
                 <div class="cart-total" id="cart-total-price">Total: 0 HUF</div>
-                <button class="btn-primary" style="margin-top: 15px;" onclick="checkout()">RENDELÉS LEADÁSA</button>
+                <button class="btn-primary" style="margin-top: 15px;" onclick="checkout()" data-i18n="btn_checkout">RENDELÉS LEADÁSA</button>
             </div>
         </div>
     </div>
 
     <div id="view-balance" class="view-content">
+        <div class="card" style="text-align: center;">
+            <p style="margin: 0; color: var(--text-muted);" data-i18n="balance_label">Aktuális egyenleged:</p>
+            <h2 style="margin: 10px 0; color: var(--accent-cyan); text-shadow: var(--glow-cyan);" id="wallet-balance-big">0 HUF</h2>
+            <button class="btn-primary" style="margin-bottom: 5px; background: transparent; border: 1px solid var(--accent-cyan); color: var(--accent-cyan); box-shadow: none;" onclick="refreshBalance()" data-i18n="btn_refresh">🔄 Frissítés</button>
+        </div>
+
         <div class="card">
-            <p>Fizetési cím (SOL):</p>
-            <div style="background: #000; padding: 15px; border-radius: 8px; font-size: 10px; word-break: break-all; border: 1px solid var(--border-color);" id="wallet-addr">HSCKinrA7mZiU5ZpnqxXK5Y7HasmFuDYNQ2WsfjD2udx</div>
-            <button class="btn-primary" style="margin-top: 15px;" onclick="copyWallet()">CÍM MÁSOLÁSA</button>
+            <h4 style="margin:0 0 10px 0; color:var(--accent-pink); text-shadow:var(--glow-pink);" data-i18n="gift_title">Gift Kód Beváltása</h4>
+            <div style="display:flex; gap:10px;">
+                <input type="text" id="gift-code-input" placeholder="Kód beírása..." data-i18n-ph="gift_ph">
+                <button class="btn-primary" style="width:auto; padding:0 20px;" onclick="redeemGiftCode()" data-i18n="btn_redeem">OK</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h4 style="margin-top:0; color: var(--accent-pink); text-shadow: var(--glow-pink);" data-i18n="wallet_title">Kripto Feltöltés</h4>
+            <p style="font-size: 12px; color: #fff;" data-i18n="wallet_desc">Fizetés kizárólag Solana (SOL) hálózaton.</p>
+            <div style="background: rgba(0,0,0,0.7); padding: 15px; border-radius: 8px; font-size: 11px; word-break: break-all; border: 1px solid var(--accent-cyan); box-shadow: inset 0 0 10px rgba(0,255,255,0.2);" id="wallet-addr">HSCKinrA7mZiU5ZpnqxXK5Y7HasmFuDYNQ2WsfjD2udx</div>
+            <button class="btn-primary" style="margin-top: 15px;" onclick="copyWallet()" data-i18n="btn_copy">CÍM MÁSOLÁSA</button>
+        </div>
+
+        <div class="card">
+            <h4 style="margin: 0 0 10px 0; color: var(--accent-cyan); text-shadow: var(--glow-cyan);" data-i18n="tx_title">Legutóbbi Tranzakciók</h4>
+            <ul class="tx-list" id="tx-history">
+                <li style="text-align: center;" data-i18n="tx_empty">Nincs még tranzakció.</li>
+            </ul>
         </div>
     </div>
 
     <div class="bottom-nav">
-        <div class="nav-item active" data-target="view-home"><span class="nav-icon">🏠</span><span>Home</span></div>
-        <div class="nav-item" data-target="view-menu"><span class="nav-icon">📋</span><span>Menu</span></div>
-        <div class="nav-item" data-target="view-balance"><span class="nav-icon">👛</span><span>Wallet</span></div>
+        <div class="nav-item active" data-target="view-home"><span class="nav-icon">🏠</span><span data-i18n="nav_home">Home</span></div>
+        <div class="nav-item" data-target="view-menu"><span class="nav-icon">📋</span><span data-i18n="nav_menu">Menu</span></div>
+        <div class="nav-item" data-target="view-balance"><span class="nav-icon">👛</span><span data-i18n="nav_wallet">Wallet</span></div>
         <div class="nav-item" data-target="view-cart"><span class="nav-icon">🛒</span><span id="cart-count-badge">Cart</span></div>
     </div>
 
@@ -173,32 +280,205 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // 1. EGYENLEG BEÁLLÍTÁSA (Átírhatod teszteléshez)
-        let userBalance = 0; 
-        document.getElementById('top-balance-display').innerText = userBalance + " HUF";
-
-        const allCities = ["Corvin", "Nyugati", "Soroksári", "Duna Plaza", "Kelenföld", "Óbuda", "Dunakeszi", "Győr", "Érd", "Budaörs", "Debrecen", "Székesfehérvár", "Szeged", "Tatabánya", "Kecskemét", "Nyíregyháza", "Miskolc", "Dunaújváros", "Szombathely", "Szolnok"];
-
-        const products = [
-            { id: 1, name: "Cocain-1g", price: 40000, img: "https://i.postimg.cc/xNCC2tp6/Coke.png", cities: allCities },
-            { id: 2, name: "Cocain-0.5g", price: 20000, img: "https://i.postimg.cc/xNCC2tp6/Coke.png", cities: allCities },
-            { id: 3, name: "AMF-2g", price: 25000, img: "https://i.postimg.cc/V0668DZG/Amf.png", cities: allCities },
-            { id: 4, name: "Meph-2g", price: 26500, img: "https://i.postimg.cc/RJFFBXpT/Meph.jpg", cities: allCities },
-            { id: 5, name: "Meph-3g", price: 41000, img: "https://i.postimg.cc/RJFFBXpT/Meph.jpg", cities: allCities },
-            { id: 6, name: "MDMA-2g", price: 28000, img: "https://i.postimg.cc/9Qs88R3h/MDMA-crystals.jpg", cities: allCities },
-            { id: 7, name: "XTC-5Pcs", price: 25000, img: "https://i.postimg.cc/QKtt30Yb/Kek-puni.jpg", cities: allCities },
-            { id: 8, name: "Meth-2g", price: 60000, img: "https://i.postimg.cc/2L66D29h/metecske.jpg", cities: allCities },
-            { id: 9, name: "Meth-3g", price: 90000, img: "https://i.postimg.cc/2L66D29h/metecske.jpg", cities: allCities },
-            { id: 10, name: "L. Cherry Gelato-3g", price: 28000, img: "https://i.postimg.cc/sGXXrwHK/W1-kep.png", cities: allCities },
-            { id: 11, name: "L. Cherry Gelato-5g", price: 40000, img: "https://i.postimg.cc/sGXXrwHK/W1-kep.png", cities: allCities },
-            { id: 12, name: "Pink Lemonade-3g", price: 24500, img: "https://i.postimg.cc/2L66D292/w2.png", cities: allCities },
-            { id: 13, name: "Pink Lemonade-5g", price: 40000, img: "https://i.postimg.cc/2L66D292/w2.png", cities: allCities },
-            { id: 14, name: "Pink Lemonade-8g", price: 60000, img: "https://i.postimg.cc/2L66D292/w2.png", cities: allCities }
-        ];
-
+        // GLOBÁLIS VÁLTOZÓK ÉS LOCALSTORAGE
+        let userBalance = parseInt(localStorage.getItem('legit_balance')) || 0;
+        let legitCoins = parseInt(localStorage.getItem('legit_coins')) || 0;
+        let activeDiscount = parseFloat(localStorage.getItem('legit_discount')) || 0; 
         let cart = [];
 
-        // NAVIGÁCIÓ
+        function updateDisplays() {
+            document.getElementById('top-balance-display').innerText = userBalance + " HUF";
+            document.getElementById('wallet-balance-big').innerText = userBalance + " HUF";
+            document.getElementById('lc-display').innerText = legitCoins;
+            
+            if (activeDiscount > 0) {
+                document.getElementById('active-coupon-display').style.display = 'block';
+                document.getElementById('active-coupon-display').innerText = `Aktív kupon: -${activeDiscount*100}%!`;
+            } else {
+                document.getElementById('active-coupon-display').style.display = 'none';
+            }
+        }
+        updateDisplays();
+
+        // --- NYELV KEZELÉSE ---
+        let currentLang = 'hu';
+        const translations = {
+            hu: {
+                top_balance: "Balance", btn_open_slot: "🎰 OPEN SLOT", slot_title: "NAPI PÖRGETÉS", btn_spin: "🎰 PÖRGETÉS", next_spin: "Új pörgetés:", slot_desc: "Pörgess minden nap LegitCoinért (LC), és váltsd be kuponokra!", coupon_shop: "Kupon Bolt",
+                welcome_title: "ÜDVÖZLÜNK!", welcome_desc: "A legjobb minőség, a leggyorsabb kiszolgálás.", btn_regions: "📋 RÉGIÓ VÁLASZTÁSA", region_bp: "Budapest & Környéke", region_vid: "Vidéki Városok",
+                btn_back: "← Vissza", cart_title: "Kosár", cart_empty: "A kosár jelenleg üres.", btn_checkout: "RENDELÉS LEADÁSA", balance_label: "Aktuális egyenleged:", btn_refresh: "🔄 Frissítés",
+                gift_title: "Gift Kód Beváltása", gift_ph: "Kód beírása...", btn_redeem: "OK", wallet_title: "Kripto Feltöltés", wallet_desc: "Fizetés kizárólag Solana (SOL) hálózaton.", btn_copy: "CÍM MÁSOLÁSA", tx_title: "Legutóbbi Tranzakciók", tx_empty: "Nincs még tranzakció.",
+                nav_home: "Home", nav_menu: "Menu", nav_wallet: "Wallet", btn_add: "Hozzáad", btn_del: "Törlés", btn_support: "💬 ÜGYFÉLSZOLGÁLAT"
+            },
+            en: {
+                top_balance: "Balance", btn_open_slot: "🎰 OPEN SLOT", slot_title: "DAILY SPIN", btn_spin: "🎰 SPIN NOW", next_spin: "Next spin:", slot_desc: "Spin daily for LegitCoins (LC) and exchange for coupons!", coupon_shop: "Coupon Shop",
+                welcome_title: "WELCOME!", welcome_desc: "Best quality, fastest service.", btn_regions: "📋 SELECT REGION", region_bp: "Budapest & Surroundings", region_vid: "Rural Cities",
+                btn_back: "← Back", cart_title: "Cart", cart_empty: "Your cart is currently empty.", btn_checkout: "PLACE ORDER", balance_label: "Current balance:", btn_refresh: "🔄 Refresh",
+                gift_title: "Redeem Gift Code", gift_ph: "Enter code...", btn_redeem: "OK", wallet_title: "Crypto Top-up", wallet_desc: "Payments exclusively on the Solana (SOL) network.", btn_copy: "COPY ADDRESS", tx_title: "Recent Transactions", tx_empty: "No transactions yet.",
+                nav_home: "Home", nav_menu: "Menu", nav_wallet: "Wallet", btn_add: "Add", btn_del: "Delete", btn_support: "💬 SUPPORT"
+            }
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'hu' ? 'en' : 'hu';
+            document.getElementById('btn-lang').innerText = currentLang === 'hu' ? 'EN' : 'HU';
+            
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang][key]) el.innerText = translations[currentLang][key];
+            });
+            document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+                const key = el.getAttribute('data-i18n-ph');
+                if (translations[currentLang][key]) el.placeholder = translations[currentLang][key];
+            });
+            renderCart(); 
+            const activeCity = document.getElementById('current-city-label').innerText;
+            if(activeCity !== "Város" && activeCity !== "City") renderProducts(activeCity);
+        }
+
+        // --- SUPPORT KEZELÉSE ---
+        function openSupport() {
+            // IDE ÍRD BE A SAJÁT VAGY AZ ÜGYFÉLSZOLGÁLATOD TELEGRAM FELHASZNÁLÓNEVÉT (pl: legitshop_admin)
+            tg.openTelegramLink('https://t.me/TE_FIOKOD_NEVE');
+        }
+
+        // --- GIFT KÓD ---
+        function redeemGiftCode() {
+            const input = document.getElementById('gift-code-input').value.trim();
+            if (input === 'start5000') {
+                const used = localStorage.getItem('gift_start5000');
+                if (used) {
+                    tg.showAlert(currentLang === 'hu' ? "Ezt a kódot már felhasználtad!" : "Code already used!");
+                } else {
+                    userBalance += 5000;
+                    localStorage.setItem('legit_balance', userBalance);
+                    localStorage.setItem('gift_start5000', 'true');
+                    updateDisplays();
+                    tg.HapticFeedback.notificationOccurred('success');
+                    tg.showAlert(currentLang === 'hu' ? "Sikeres beváltás! +5000 HUF" : "Success! +5000 HUF");
+                    
+                    const txList = document.getElementById('tx-history');
+                    if(txList.innerHTML.includes(translations[currentLang].tx_empty)) txList.innerHTML = '';
+                    txList.innerHTML += `<li>+ 5000 HUF (Gift Code)</li>`;
+                    document.getElementById('gift-code-input').value = '';
+                }
+            } else {
+                tg.showAlert(currentLang === 'hu' ? "Érvénytelen kód." : "Invalid code.");
+            }
+        }
+
+        // --- SLOT MACHINE & LEGITCOIN ---
+        const emojis = ["🍒", "💎", "7️⃣", "🍀", "🔔"];
+        const SPIN_COOLDOWN = 24 * 60 * 60 * 1000;
+        
+        function checkSpinStatus() {
+            const lastSpin = localStorage.getItem('lastSpinTime');
+            const now = Date.now();
+            if (lastSpin && (now - lastSpin < SPIN_COOLDOWN)) {
+                document.getElementById('btn-spin').disabled = true;
+                document.getElementById('spin-timer').style.display = 'block';
+                updateTimer(lastSpin);
+                setInterval(() => updateTimer(lastSpin), 1000);
+            }
+        }
+
+        function updateTimer(lastSpin) {
+            const now = Date.now();
+            const diff = SPIN_COOLDOWN - (now - lastSpin);
+            if (diff <= 0) {
+                document.getElementById('btn-spin').disabled = false;
+                document.getElementById('spin-timer').style.display = 'none';
+                return;
+            }
+            const h = Math.floor(diff / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            document.getElementById('timer-val').innerText = `${h}h ${m}m`;
+        }
+
+        function spinSlot() {
+            if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('heavy');
+            const btn = document.getElementById('btn-spin');
+            btn.disabled = true;
+            
+            const s1 = document.getElementById('slot1'), s2 = document.getElementById('slot2'), s3 = document.getElementById('slot3');
+            let spins = 0;
+            const interval = setInterval(() => {
+                s1.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                s2.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                s3.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                spins++;
+                
+                if (spins > 20) {
+                    clearInterval(interval);
+                    finishSpin();
+                }
+            }, 100);
+        }
+
+        function finishSpin() {
+            localStorage.setItem('lastSpinTime', Date.now());
+            checkSpinStatus();
+            
+            const wonLC = Math.floor(Math.random() * 41) + 10; 
+            legitCoins += wonLC;
+            localStorage.setItem('legit_coins', legitCoins);
+            updateDisplays();
+            
+            setTimeout(() => {
+                tg.showAlert(currentLang === 'hu' ? `Nyertél ${wonLC} LegitCoint! 🪙` : `You won ${wonLC} LegitCoins! 🪙`);
+            }, 300);
+        }
+
+        function buyCoupon(pct, cost) {
+            if (activeDiscount > 0) {
+                tg.showAlert(currentLang === 'hu' ? "Már van aktív kuponod!" : "You already have an active coupon!");
+                return;
+            }
+            if (legitCoins >= cost) {
+                legitCoins -= cost;
+                activeDiscount = pct;
+                localStorage.setItem('legit_coins', legitCoins);
+                localStorage.setItem('legit_discount', activeDiscount);
+                updateDisplays();
+                renderCart(); 
+                tg.HapticFeedback.notificationOccurred('success');
+                tg.showAlert(currentLang === 'hu' ? `Sikeres vásárlás! -${pct*100}% kupon aktiválva.` : `Success! -${pct*100}% coupon activated.`);
+            } else {
+                tg.showAlert(currentLang === 'hu' ? "Nincs elég LegitCoinod!" : "Not enough LegitCoins!");
+            }
+        }
+
+        // --- WALLET FRISSÍTÉS ---
+        function refreshBalance() {
+            if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+            const el1 = document.getElementById('top-balance-display');
+            const el2 = document.getElementById('wallet-balance-big');
+            el1.style.opacity = '0.5'; el2.style.opacity = '0.5';
+            setTimeout(() => {
+                el1.style.opacity = '1'; el2.style.opacity = '1';
+                tg.showAlert(currentLang === 'hu' ? "Egyenleg frissítve!" : "Balance refreshed!");
+            }, 800);
+        }
+
+        // --- TERMÉKEK ---
+        const products = [
+            { id: 1, name: "Cocain-1g", price: 40000, img: "https://i.postimg.cc/xNCC2tp6/Coke.png", cities: ["Corvin", "Nyugati", "Soroksári", "Kelenföld", "Óbuda", "Győr", "Érd", "Debrecen", "Tatabánya", "Kecskemét", "Miskolc", "Dunaújváros", "Szombathely"] },
+            { id: 2, name: "Cocain-0.5g", price: 20000, img: "https://i.postimg.cc/xNCC2tp6/Coke.png", cities: ["Nyugati", "Duna Plaza", "Kelenföld", "Óbuda", "Dunakeszi", "Budaörs", "Debrecen", "Szeged", "Tatabánya", "Nyíregyháza", "Miskolc", "Dunaújváros", "Szolnok"] },
+            { id: 3, name: "AMF-2g", price: 25000, img: "https://i.postimg.cc/V0668DZG/Amf.png", cities: ["Corvin", "Nyugati", "Soroksári", "Duna Plaza", "Kelenföld", "Budaörs", "Debrecen", "Székesfehérvár", "Szeged", "Tatabánya", "Kecskemét", "Szombathely", "Szolnok"] },
+            { id: 4, name: "Meph-2g", price: 26500, img: "https://i.postimg.cc/RJFFBXpT/Meph.jpg", cities: ["Corvin", "Nyugati", "Soroksári", "Duna Plaza", "Kelenföld", "Óbuda", "Dunakeszi", "Győr", "Érd", "Budaörs", "Debrecen", "Székesfehérvár", "Szeged", "Tatabánya", "Kecskemét", "Nyíregyháza", "Miskolc"] },
+            { id: 5, name: "Meph-3g", price: 41000, img: "https://i.postimg.cc/RJFFBXpT/Meph.jpg", cities: ["Corvin", "Nyugati", "Soroksári", "Duna Plaza", "Kelenföld", "Óbuda", "Dunakeszi", "Győr", "Érd", "Budaörs", "Debrecen", "Székesfehérvár", "Szeged", "Tatabánya", "Kecskemét", "Nyíregyháza", "Miskolc", "Dunaújváros", "Szombathely", "Szolnok"] },
+            { id: 6, name: "MDMA-2g", price: 28000, img: "https://i.postimg.cc/9Qs88R3h/MDMA-crystals.jpg", cities: ["Corvin", "Nyugati", "Soroksári", "Duna Plaza", "Kelenföld", "Óbuda", "Szeged", "Tatabánya", "Kecskemét", "Nyíregyháza", "Miskolc", "Dunaújváros", "Szombathely", "Szolnok"] },
+            { id: 7, name: "XTC-5Pcs", price: 25000, img: "https://i.postimg.cc/QKtt30Yb/Kek-puni.jpg", cities: ["Corvin", "Nyugati", "Soroksári", "Duna Plaza", "Kelenföld", "Óbuda", "Dunakeszi", "Győr", "Érd", "Budaörs", "Debrecen", "Székesfehérvár", "Szeged", "Tatabánya", "Kecskemét", "Nyíregyháza", "Miskolc", "Dunaújváros", "Szombathely", "Szolnok"] },
+            { id: 8, name: "Meth-2g", price: 60000, img: "https://i.postimg.cc/2L66D29h/metecske.jpg", cities: ["Corvin", "Nyugati", "Soroksári", "Duna Plaza", "Kelenföld", "Óbuda", "Dunakeszi", "Győr", "Érd", "Budaörs", "Szeged", "Nyíregyháza", "Miskolc", "Dunaújváros", "Szombathely", "Szolnok"] },
+            { id: 9, name: "Meth-3g", price: 90000, img: "https://i.postimg.cc/2L66D29h/metecske.jpg", cities: ["Corvin", "Nyugati", "Soroksári", "Duna Plaza", "Kelenföld", "Óbuda", "Dunakeszi", "Győr", "Érd", "Budaörs", "Debrecen", "Székesfehérvár", "Szeged", "Tatabánya", "Kecskemét", "Nyíregyháza", "Miskolc", "Dunaújváros", "Szombathely", "Szolnok"] },
+            { id: 10, name: "L. Cherry Gelato-3g", price: 28000, img: "https://i.postimg.cc/sGXXrwHK/W1-kep.png", cities: ["Corvin", "Nyugati", "Soroksári", "Duna Plaza", "Kelenföld", "Óbuda", "Dunakeszi", "Győr", "Érd", "Budaörs", "Debrecen", "Nyíregyháza", "Miskolc", "Dunaújváros", "Szombathely", "Szolnok"] },
+            { id: 11, name: "L. Cherry Gelato-5g", price: 40000, img: "https://i.postimg.cc/sGXXrwHK/W1-kep.png", cities: ["Corvin", "Nyugati", "Soroksári", "Duna Plaza", "Székesfehérvár", "Szeged", "Tatabánya", "Kecskemét", "Nyíregyháza", "Miskolc", "Dunaújváros", "Szombathely", "Szolnok"] },
+            { id: 12, name: "Pink Lemonade-3g", price: 24500, img: "https://i.postimg.cc/2L66D292/w2.png", cities: ["Corvin", "Nyugati", "Soroksári", "Duna Plaza", "Kelenföld", "Óbuda", "Dunakeszi", "Győr", "Érd", "Budaörs", "Debrecen", "Székesfehérvár", "Szeged", "Tatabánya", "Kecskemét", "Nyíregyháza", "Miskolc", "Dunaújváros", "Szombathely", "Szolnok"] },
+            { id: 13, name: "Pink Lemonade-5g", price: 40000, img: "https://i.postimg.cc/2L66D292/w2.png", cities: ["Corvin", "Nyugati", "Soroksári", "Duna Plaza", "Kelenföld", "Óbuda", "Dunakeszi", "Győr", "Érd", "Budaörs", "Debrecen", "Székesfehérvár", "Szeged", "Tatabánya", "Szolnok"] },
+            { id: 14, name: "Pink Lemonade-8g", price: 60000, img: "https://i.postimg.cc/2L66D292/w2.png", cities: ["Corvin", "Nyugati", "Soroksári", "Duna Plaza", "Kelenföld", "Óbuda", "Dunakeszi", "Győr", "Érd", "Budaörs", "Debrecen", "Székesfehérvár", "Szeged", "Dunaújváros", "Szombathely", "Szolnok"] }
+        ];
+
+        // NAV & KOSÁR RENDSZER
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', () => {
                 document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
@@ -213,7 +493,6 @@
             if(viewId === 'view-cart') renderCart();
         }
 
-        // VÁROS KIVÁLASZTÁS
         document.querySelectorAll('.city-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const cityName = this.innerText;
@@ -226,9 +505,10 @@
         function renderProducts(cityName) {
             const container = document.getElementById('product-list-container');
             container.innerHTML = '';
-            const filtered = products.filter(p => p.cities.includes(cityName));
-            
-            filtered.forEach(p => {
+            const filteredProducts = products.filter(p => p.cities.includes(cityName));
+            const btnText = translations[currentLang].btn_add;
+
+            filteredProducts.forEach(p => {
                 const card = document.createElement('div');
                 card.className = 'product-card';
                 card.innerHTML = `
@@ -241,7 +521,7 @@
                             <span class="p-qty">1</span>
                             <button class="qty-btn" onclick="updateQtyBtn(this, 1)">+</button>
                         </div>
-                        <button class="btn-primary" style="padding: 8px; font-size:12px;" onclick="addToCart(${p.id}, this)">Hozzáad</button>
+                        <button class="btn-primary" style="padding: 8px; font-size:12px;" onclick="addToCart(${p.id}, this)">${btnText}</button>
                     </div>
                 `;
                 container.appendChild(card);
@@ -261,25 +541,28 @@
             const existing = cart.find(item => item.id === productId);
             if(existing) { existing.qty += qty; } else { cart.push({ ...product, qty: qty }); }
             updateCartBadge();
-            tg.HapticFeedback.impactOccurred('medium');
-            alert("Added to cart!");
+            tg.HapticFeedback.impactOccurred('light');
+            tg.showAlert(currentLang === 'hu' ? "Kosárba került!" : "Added to cart!");
         }
 
         function updateCartBadge() {
             const count = cart.reduce((sum, item) => sum + item.qty, 0);
-            document.getElementById('cart-count-badge').innerText = count > 0 ? `Cart (${count})` : "Cart";
+            document.getElementById('cart-count-badge').innerText = count > 0 ? (currentLang === 'hu' ? `Kosár (${count})` : `Cart (${count})`) : (currentLang === 'hu' ? "Kosár" : "Cart");
         }
 
         function renderCart() {
             const container = document.getElementById('cart-items-container');
             const footer = document.getElementById('cart-footer');
+            const discDisplay = document.getElementById('discount-display');
+            
             if(cart.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 20px;">Your cart is empty.</p>';
+                container.innerHTML = `<p style="text-align: center; color: var(--text-muted); padding: 20px;">${translations[currentLang].cart_empty}</p>`;
                 footer.style.display = 'none';
                 return;
             }
             footer.style.display = 'block';
             container.innerHTML = '';
+            
             let total = 0;
             cart.forEach((item, index) => {
                 const subtotal = item.price * item.qty;
@@ -287,12 +570,24 @@
                 const div = document.createElement('div');
                 div.className = 'cart-item';
                 div.innerHTML = `
-                    <div><div style="font-weight:bold;">${item.name}</div><div style="font-size:11px;">${item.qty}x ${item.price} HUF</div></div>
-                    <div style="text-align:right;"><div style="color:var(--accent-green);">${subtotal} HUF</div><button onclick="removeFromCart(${index})" style="background:none; border:none; color:red; font-size:10px;">Delete</button></div>
+                    <div><div style="font-weight:bold; color:#fff;">${item.name}</div><div style="font-size:11px; color:var(--text-muted);">${item.qty}x ${item.price} HUF</div></div>
+                    <div style="text-align:right;"><div style="color:var(--accent-cyan); text-shadow: var(--glow-cyan);">${subtotal} HUF</div><button onclick="removeFromCart(${index})" style="background:none; border:none; color:var(--accent-pink); font-size:11px; font-weight:bold; cursor:pointer;">${translations[currentLang].btn_del}</button></div>
                 `;
                 container.appendChild(div);
             });
-            document.getElementById('cart-total-price').innerText = `Total: ${total} HUF`;
+
+            let finalTotal = total;
+            if (activeDiscount > 0) {
+                const minus = total * activeDiscount;
+                finalTotal = total - minus;
+                discDisplay.style.display = 'block';
+                discDisplay.innerText = currentLang === 'hu' ? `Kupon kedvezmény: -${minus} HUF` : `Discount: -${minus} HUF`;
+            } else {
+                discDisplay.style.display = 'none';
+            }
+            
+            document.getElementById('cart-total-price').innerText = `Total: ${finalTotal} HUF`;
+            document.getElementById('cart-footer').dataset.finalTotal = finalTotal;
         }
 
         function removeFromCart(index) {
@@ -304,31 +599,39 @@
         function copyWallet() {
             const addr = document.getElementById('wallet-addr').innerText;
             navigator.clipboard.writeText(addr);
-            tg.showAlert("Address copied!");
+            tg.showAlert(currentLang === 'hu' ? "Cím másolva!" : "Address copied!");
         }
 
-        // --- CHECKOUT ELLENŐRZÉSSEL ---
         function checkout() {
-            let total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-
-            if (userBalance < total) {
+            const finalTotal = parseFloat(document.getElementById('cart-footer').dataset.finalTotal);
+            
+            if (userBalance < finalTotal) {
                 if (tg && tg.showAlert) {
                     tg.HapticFeedback.notificationOccurred('error');
-                    tg.showAlert("Insufficient balance! Please top up your account to complete the purchase.");
+                    tg.showAlert(currentLang === 'hu' ? "Nincs elegendő egyenleg! Kérlek töltsd fel a fiókod." : "Insufficient balance! Please top up your account.");
                 } else {
-                    alert("Insufficient balance! Please top up your account.");
+                    alert("Insufficient balance!");
                 }
                 return;
             }
 
-            tg.showConfirm("Are you sure you want to place this order?", (ok) => {
+            const confirmMsg = currentLang === 'hu' ? "Leadod a rendelést?" : "Place the order?";
+            tg.showConfirm(confirmMsg, (ok) => {
                 if(ok) {
                     const selectedCity = document.getElementById('current-city-label').innerText;
-                    tg.sendData(JSON.stringify({order: cart, city: selectedCity, total: total}));
+                    userBalance -= finalTotal;
+                    activeDiscount = 0;
+                    localStorage.setItem('legit_balance', userBalance);
+                    localStorage.setItem('legit_discount', 0);
+                    
+                    tg.sendData(JSON.stringify({order: cart, city: selectedCity, total: finalTotal}));
                     tg.close();
                 }
             });
         }
+
+        // INDÍTÁS
+        checkSpinStatus();
     </script>
 </body>
 </html>
